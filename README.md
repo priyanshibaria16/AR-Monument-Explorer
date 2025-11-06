@@ -8,7 +8,7 @@ A modern web application built with React, TypeScript, and shadcn/ui components.
 - 🎨 Styled with Tailwind CSS
 - 🧩 shadcn/ui components for beautiful UI
 - 🌐 React Three Fiber for 3D graphics
-- 🔐 Supabase integration for backend services
+- 🔐 Node.js backend with MongoDB database
 - 📱 Fully responsive design
 - 🛠 TypeScript for type safety
 
@@ -20,7 +20,8 @@ A modern web application built with React, TypeScript, and shadcn/ui components.
 - **UI Components**: shadcn/ui
 - **3D Graphics**: React Three Fiber
 - **State Management**: React Query
-- **Backend**: Supabase
+- **Backend**: Node.js with Express
+- **Database**: MongoDB
 - **Form Handling**: React Hook Form
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
@@ -48,13 +49,25 @@ A modern web application built with React, TypeScript, and shadcn/ui components.
    ```
 
 3. **Set up environment variables**
-   Create a `.env` file in the root directory and add your Supabase credentials:
+   Create a `.env` file in the root directory and add your API URL:
    ```env
-   VITE_SUPABASE_URL=your-supabase-url
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+   VITE_API_URL=http://localhost:3001/api
    ```
 
-4. **Start the development server**
+4. **Set up the backend**
+   ```bash
+   cd server
+   npm install
+   # Create a .env file with MongoDB connection string
+   echo "MONGODB_URI=mongodb://localhost:27017/explorer" > .env
+   echo "PORT=3001" >> .env
+   # Seed the database
+   node seed.js
+   # Start the backend server
+   npm run dev
+   ```
+
+5. **Start the frontend development server**
    ```bash
    pnpm dev
    # or
@@ -76,9 +89,14 @@ A modern web application built with React, TypeScript, and shadcn/ui components.
 ```
 .
 ├── public/          # Static files
+├── server/          # Backend server
+│   ├── models/      # MongoDB models
+│   ├── routes/      # API routes
+│   └── server.js    # Server entry point
 ├── src/             # Source files
 │   ├── assets/      # Images, fonts, etc.
 │   ├── components/  # Reusable components
+│   ├── hooks/       # Custom React hooks
 │   ├── lib/         # Utility functions
 │   ├── pages/       # Page components
 │   └── styles/      # Global styles

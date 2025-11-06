@@ -1,11 +1,12 @@
-// Re-export types from API
-export type { Monument, QuizQuestion, Achievement, UserProgress } from './api';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import Monument from './models/Monument.js';
+import QuizQuestion from './models/QuizQuestion.js';
+import Achievement from './models/Achievement.js';
 
-// Import API functions and types
-import { api, type Monument, type QuizQuestion, type Achievement, type UserProgress } from './api';
+dotenv.config();
 
-// Fallback data (will be replaced by API calls)
-export const monuments: Monument[] = [
+const monumentsData = [
   {
     id: 'taj-mahal',
     name: 'Taj Mahal',
@@ -108,8 +109,7 @@ export const monuments: Monument[] = [
   }
 ];
 
-// Fallback data (will be replaced by API calls)
-export const quizQuestions: QuizQuestion[] = [
+const quizQuestionsData = [
   {
     id: 'q1',
     monumentId: 'taj-mahal',
@@ -182,8 +182,7 @@ export const quizQuestions: QuizQuestion[] = [
   }
 ];
 
-// Fallback data (will be replaced by API calls)
-export const achievements: Achievement[] = [
+const achievementsData = [
   {
     id: 'first-monument',
     name: 'Explorer Beginner',
@@ -242,116 +241,35 @@ export const achievements: Achievement[] = [
   }
 ];
 
-export const getUserProgress = async (): Promise<UserProgress> => {
+async function seedDatabase() {
   try {
-    return await api.getUserProgress();
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/explorer');
+    console.log('Connected to MongoDB');
+
+    // Clear existing data
+    await Monument.deleteMany({});
+    await QuizQuestion.deleteMany({});
+    await Achievement.deleteMany({});
+
+    // Insert monuments
+    await Monument.insertMany(monumentsData);
+    console.log('Monuments seeded');
+
+    // Insert quiz questions
+    await QuizQuestion.insertMany(quizQuestionsData);
+    console.log('Quiz questions seeded');
+
+    // Insert achievements
+    await Achievement.insertMany(achievementsData);
+    console.log('Achievements seeded');
+
+    console.log('Database seeded successfully!');
+    process.exit(0);
   } catch (error) {
-    console.error('Error fetching user progress:', error);
-    // Return default progress if API fails
-    return {
-      visitedMonuments: [],
-      arViewed: [],
-      narrationPlayed: [],
-      quizScores: {},
-      achievements: [],
-      favorites: [],
-      tourProgress: 0,
-      comparedMonuments: []
-    };
+    console.error('Error seeding database:', error);
+    process.exit(1);
   }
-};
+}
 
-export const updateUserProgress = async (progress: Partial<UserProgress>): Promise<UserProgress> => {
-  try {
-    return await api.updateUserProgress(progress);
-  } catch (error) {
-    console.error('Error updating user progress:', error);
-    throw error;
-  }
-};
+seedDatabase();
 
-export const checkAndUnlockAchievements = async (progress: UserProgress, monuments: Monument[]): Promise<string[]> => {
-  const newAchievements: string[] = [];
-
-  if (progress.visitedMonuments.length >= 1 && !progress.achievements.includes('first-monument')) {
-    newAchievements.push('first-monument');
-  }
-
-  if (progress.arViewed.length >= 1 && !progress.achievements.includes('ar-pioneer')) {
-    newAchievements.push('ar-pioneer');
-  }
-
-  if (progress.visitedMonuments.length >= monuments.length && !progress.achievements.includes('monument-collector')) {
-    newAchievements.push('monument-collector');
-  }
-
-  if (progress.narrationPlayed.length >= 3 && !progress.achievements.includes('history-buff')) {
-    newAchievements.push('history-buff');
-  }
-
-  const hasAnyPerfectScore = Object.values(progress.quizScores).some((score) => score === 100);
-  if (hasAnyPerfectScore && !progress.achievements.includes('quiz-master')) {
-    newAchievements.push('quiz-master');
-  }
-
-  const allPerfectScores = Object.keys(progress.quizScores).length >= monuments.length &&
-    Object.values(progress.quizScores).every((score) => score === 100);
-  if (allPerfectScores && !progress.achievements.includes('perfect-scholar')) {
-    newAchievements.push('perfect-scholar');
-  }
-
-  if (progress.tourProgress >= monuments.length && !progress.achievements.includes('tour-guide')) {
-    newAchievements.push('tour-guide');
-  }
-
-  if (newAchievements.length > 0) {
-    for (const achievementId of newAchievements) {
-      try {
-        await api.addAchievement(achievementId);
-      } catch (error) {
-        console.error(`Error adding achievement ${achievementId}:`, error);
-      }
-    }
-  }
-
-  return newAchievements;
-};
-
-export const toggleFavorite = async (monumentId: string): Promise<boolean> => {
-  try {
-    const progress = await api.toggleFavorite(monumentId);
-    return progress.favorites.includes(monumentId);
-  } catch (error) {
-    console.error('Error toggling favorite:', error);
-    throw error;
-  }
-};
-
-export const shareMonument = async (monument: Monument, platform: string) => {
-  try {
-    const progress = await getUserProgress();
-    
-    if (!progress.achievements.includes('social-sharer')) {
-      await api.addAchievement('social-sharer');
-    }
-  } catch (error) {
-    console.error('Error adding share achievement:', error);
-  }
-
-  const text = `Check out ${monument.name} in AR! Explore India's heritage in 3D.`;
-  const url = window.location.origin + `/monument/${monument.id}`;
-
-  const shareUrls: Record<string, string> = {
-    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`
-  };
-
-  if (shareUrls[platform]) {
-    window.open(shareUrls[platform], '_blank', 'width=600,height=400');
-  }
-};
-
-// Export API functions for direct use
-export { api };

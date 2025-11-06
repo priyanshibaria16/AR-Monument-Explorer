@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { monuments, getUserProgress, toggleFavorite } from '@/lib/monumentData';
+import { toggleFavorite } from '@/lib/monumentData';
+import { useMonuments, useUserProgress } from '@/hooks/useData';
 import { Map, Trophy, BookOpen, Sparkles, Search, Heart, Play, Clock, Images } from 'lucide-react';
 import { toast } from 'sonner';
 import 'leaflet/dist/leaflet.css';
@@ -29,7 +30,8 @@ export default function Index() {
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
   const [selectedEra, setSelectedEra] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const userProgress = getUserProgress();
+  const { monuments, loading: monumentsLoading } = useMonuments();
+  const { progress: userProgress, loading: progressLoading } = useUserProgress();
 
   const filteredMonuments = monuments.filter(monument => {
     const matchesSearch = monument.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -40,10 +42,14 @@ export default function Index() {
     return matchesSearch && matchesRegion && matchesEra && matchesCategory;
   });
 
-  const handleFavoriteToggle = (monumentId: string, e: React.MouseEvent) => {
+  const handleFavoriteToggle = async (monumentId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const isFavorite = toggleFavorite(monumentId);
-    toast.success(isFavorite ? 'Added to favorites' : 'Removed from favorites');
+    try {
+      const isFavorite = await toggleFavorite(monumentId);
+      toast.success(isFavorite ? 'Added to favorites' : 'Removed from favorites');
+    } catch (error) {
+      toast.error('Failed to update favorite');
+    }
   };
 
   const startVirtualTour = () => {
@@ -122,8 +128,8 @@ export default function Index() {
           >
             {[
               { label: 'Monuments', value: monuments.length },
-              { label: 'Visited', value: userProgress.visitedMonuments.length },
-              { label: 'Achievements', value: userProgress.achievements.length }
+              { label: 'Visited', value: userProgress?.visitedMonuments.length || 0 },
+              { label: 'Achievements', value: userProgress?.achievements.length || 0 }
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="text-4xl font-bold">{stat.value}</div>
@@ -271,8 +277,13 @@ export default function Index() {
 
           {/* Monument Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMonuments.map((monument, index) => {
-              const isFavorite = userProgress.favorites.includes(monument.id);
+            {(monumentsLoading || progressLoading) ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground">Loading monuments...</p>
+              </div>
+            ) : (
+              filteredMonuments.map((monument, index) => {
+                const isFavorite = userProgress?.favorites.includes(monument.id) || false;
               
               return (
                 <motion.div
@@ -301,7 +312,7 @@ export default function Index() {
                         className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={(e) => handleFavoriteToggle(monument.id, e)}
                       >
-                        <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                        <Heart className={`w-4 h-4 ${userProgress?.favorites.includes(monument.id) ? 'fill-red-500 text-red-500' : ''}`} />
                       </Button>
                     </div>
                     <CardHeader>
@@ -325,7 +336,8 @@ export default function Index() {
                   </Card>
                 </motion.div>
               );
-            })}
+            })
+            )}
           </div>
 
           {filteredMonuments.length === 0 && (
