@@ -7,7 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThreeViewer from '@/components/ThreeViewer';
 import ARViewer from '@/components/ARViewer';
-import { monuments, getUserProgress, updateUserProgress, checkAndUnlockAchievements, toggleFavorite, shareMonument } from '@/lib/monumentData';
+import { monuments, toggleFavorite, shareMonument } from '@/lib/monumentData';
+import { useMonuments, useUserProgress } from '@/hooks/useData';
+import { api } from '@/lib/api';
 import { ArrowLeft, Camera, Volume2, BookOpen, Trophy, Heart, Share2, Info, Lightbulb, ArrowRight, Twitter, Facebook, Linkedin, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -24,27 +26,22 @@ export default function Monument() {
   const [showAR, setShowAR] = useState(false);
   const [isNarrating, setIsNarrating] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-  const monument = monuments.find(m => m.id === id);
+  const { monuments: monumentsList } = useMonuments();
+  const { progress: userProgress, refreshProgress } = useUserProgress();
+  const monument = monumentsList.find(m => m.id === id) || monuments.find(m => m.id === id);
   const tourMode = location.state?.tourMode;
 
   useEffect(() => {
-    if (monument) {
-      const progress = getUserProgress();
-      setIsFavorite(progress.favorites.includes(monument.id));
+    if (monument && userProgress) {
+      setIsFavorite((userProgress.favorites || []).includes(monument.id));
       
-      if (!progress.visitedMonuments.includes(monument.id)) {
-        progress.visitedMonuments.push(monument.id);
-        updateUserProgress(progress);
-        
-        const newAchievements = checkAndUnlockAchievements(progress);
-        if (newAchievements.length > 0) {
-          toast.success('Achievement Unlocked!', {
-            description: 'Check your achievements page'
-          });
-        }
+      if (!(userProgress.visitedMonuments || []).includes(monument.id)) {
+        api.addVisitedMonument(monument.id).then(() => {
+          refreshProgress();
+        }).catch(console.error);
       }
     }
-  }, [monument]);
+  }, [monument, userProgress, refreshProgress]);
 
   if (!monument) {
     return (
@@ -58,17 +55,13 @@ export default function Monument() {
   }
 
   const handleARView = () => {
-    const progress = getUserProgress();
-    if (!progress.arViewed.includes(monument.id)) {
-      progress.arViewed.push(monument.id);
-      updateUserProgress(progress);
-      
-      const newAchievements = checkAndUnlockAchievements(progress);
-      if (newAchievements.length > 0) {
+    if (userProgress && !(userProgress.arViewed || []).includes(monument.id)) {
+      api.addARViewed(monument.id).then(() => {
+        refreshProgress();
         toast.success('Achievement Unlocked!', {
           description: 'AR Pioneer badge earned!'
         });
-      }
+      }).catch(console.error);
     }
     setShowAR(true);
   };
@@ -89,17 +82,13 @@ export default function Monument() {
       utterance.onend = () => {
         setIsNarrating(false);
         
-        const progress = getUserProgress();
-        if (!progress.narrationPlayed.includes(monument.id)) {
-          progress.narrationPlayed.push(monument.id);
-          updateUserProgress(progress);
-          
-          const newAchievements = checkAndUnlockAchievements(progress);
-          if (newAchievements.length > 0) {
+        if (userProgress && !(userProgress.narrationPlayed || []).includes(monument.id)) {
+          api.addNarrationPlayed(monument.id).then(() => {
+            refreshProgress();
             toast.success('Achievement Unlocked!', {
               description: 'History Buff badge earned!'
             });
-          }
+          }).catch(console.error);
         }
       };
 
@@ -121,8 +110,9 @@ export default function Monument() {
     toast.success(`Shared on ${platform}!`);
   };
 
-  const currentIndex = monuments.findIndex(m => m.id === monument.id);
-  const nextMonument = monuments[(currentIndex + 1) % monuments.length];
+  const monumentsToUse = monumentsList.length > 0 ? monumentsList : monuments;
+  const currentIndex = monumentsToUse.findIndex(m => m.id === monument.id);
+  const nextMonument = monumentsToUse[(currentIndex + 1) % monumentsToUse.length];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background">
@@ -365,7 +355,7 @@ export default function Monument() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {monuments
+                  {monumentsToUse
                     .filter(m => m.id !== monument.id)
                     .slice(0, 3)
                     .map(m => (

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const userProgressSchema = new mongoose.Schema({
-  userId: { type: String, required: true, unique: true, default: 'default' },
+  userId: { type: String, required: true, unique: true, default: 'default', index: true },
   visitedMonuments: { type: [String], default: [] },
   arViewed: { type: [String], default: [] },
   narrationPlayed: { type: [String], default: [] },

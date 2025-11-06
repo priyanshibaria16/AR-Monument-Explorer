@@ -6,7 +6,14 @@ const router = express.Router();
 // Get user progress
 router.get('/:userId?', async (req, res) => {
   try {
-    const userId = req.params.userId || 'default';
+    // Get userId from token if authenticated, otherwise use default
+    let userId = req.params.userId || 'default';
+    
+    // If user is authenticated, use their userId from token
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+    }
+    
     let progress = await UserProgress.findOne({ userId });
     
     if (!progress) {
@@ -32,7 +39,10 @@ router.get('/:userId?', async (req, res) => {
 // Update user progress
 router.put('/:userId?', async (req, res) => {
   try {
-    const userId = req.params.userId || 'default';
+    let userId = req.params.userId || 'default';
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+    }
     const updateData = req.body;
     
     // Handle quizScores if it's an object
@@ -63,7 +73,10 @@ router.put('/:userId?', async (req, res) => {
 // Add visited monument
 router.post('/visited/:userId?', async (req, res) => {
   try {
-    const userId = req.params.userId || 'default';
+    let userId = req.params.userId || 'default';
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+    }
     const { monumentId } = req.body;
     
     const progress = await UserProgress.findOneAndUpdate(
@@ -72,7 +85,15 @@ router.post('/visited/:userId?', async (req, res) => {
       { new: true, upsert: true }
     );
     
-    res.json(progress);
+    // Convert Map to object for JSON response
+    const progressObj = progress.toObject();
+    if (progress.quizScores instanceof Map) {
+      progressObj.quizScores = Object.fromEntries(progress.quizScores);
+    } else {
+      progressObj.quizScores = progress.quizScores || {};
+    }
+    
+    res.json(progressObj);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -81,7 +102,10 @@ router.post('/visited/:userId?', async (req, res) => {
 // Add AR viewed
 router.post('/ar/:userId?', async (req, res) => {
   try {
-    const userId = req.params.userId || 'default';
+    let userId = req.params.userId || 'default';
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+    }
     const { monumentId } = req.body;
     
     const progress = await UserProgress.findOneAndUpdate(
@@ -90,7 +114,15 @@ router.post('/ar/:userId?', async (req, res) => {
       { new: true, upsert: true }
     );
     
-    res.json(progress);
+    // Convert Map to object for JSON response
+    const progressObj = progress.toObject();
+    if (progress.quizScores instanceof Map) {
+      progressObj.quizScores = Object.fromEntries(progress.quizScores);
+    } else {
+      progressObj.quizScores = progress.quizScores || {};
+    }
+    
+    res.json(progressObj);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -99,7 +131,10 @@ router.post('/ar/:userId?', async (req, res) => {
 // Add narration played
 router.post('/narration/:userId?', async (req, res) => {
   try {
-    const userId = req.params.userId || 'default';
+    let userId = req.params.userId || 'default';
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+    }
     const { monumentId } = req.body;
     
     const progress = await UserProgress.findOneAndUpdate(
@@ -108,7 +143,15 @@ router.post('/narration/:userId?', async (req, res) => {
       { new: true, upsert: true }
     );
     
-    res.json(progress);
+    // Convert Map to object for JSON response
+    const progressObj = progress.toObject();
+    if (progress.quizScores instanceof Map) {
+      progressObj.quizScores = Object.fromEntries(progress.quizScores);
+    } else {
+      progressObj.quizScores = progress.quizScores || {};
+    }
+    
+    res.json(progressObj);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -117,7 +160,10 @@ router.post('/narration/:userId?', async (req, res) => {
 // Update quiz score
 router.post('/quiz/:userId?', async (req, res) => {
   try {
-    const userId = req.params.userId || 'default';
+    let userId = req.params.userId || 'default';
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+    }
     const { monumentId, score } = req.body;
     
     let progress = await UserProgress.findOne({ userId });
@@ -144,14 +190,19 @@ router.post('/quiz/:userId?', async (req, res) => {
 // Toggle favorite
 router.post('/favorite/:userId?', async (req, res) => {
   try {
-    const userId = req.params.userId || 'default';
+    let userId = req.params.userId || 'default';
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+    }
     const { monumentId } = req.body;
     
     const progress = await UserProgress.findOne({ userId });
     if (!progress) {
       const newProgress = new UserProgress({ userId, favorites: [monumentId] });
       await newProgress.save();
-      return res.json(newProgress);
+      const progressObj = newProgress.toObject();
+      progressObj.quizScores = {};
+      return res.json(progressObj);
     }
     
     const isFavorite = progress.favorites.includes(monumentId);
@@ -162,7 +213,15 @@ router.post('/favorite/:userId?', async (req, res) => {
     }
     
     await progress.save();
-    res.json(progress);
+    // Convert Map to object for JSON response
+    const progressObj = progress.toObject();
+    if (progress.quizScores instanceof Map) {
+      progressObj.quizScores = Object.fromEntries(progress.quizScores);
+    } else {
+      progressObj.quizScores = progress.quizScores || {};
+    }
+    
+    res.json(progressObj);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -171,7 +230,10 @@ router.post('/favorite/:userId?', async (req, res) => {
 // Add achievement
 router.post('/achievement/:userId?', async (req, res) => {
   try {
-    const userId = req.params.userId || 'default';
+    let userId = req.params.userId || 'default';
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+    }
     const { achievementId } = req.body;
     
     const progress = await UserProgress.findOneAndUpdate(
@@ -180,7 +242,15 @@ router.post('/achievement/:userId?', async (req, res) => {
       { new: true, upsert: true }
     );
     
-    res.json(progress);
+    // Convert Map to object for JSON response
+    const progressObj = progress.toObject();
+    if (progress.quizScores instanceof Map) {
+      progressObj.quizScores = Object.fromEntries(progress.quizScores);
+    } else {
+      progressObj.quizScores = progress.quizScores || {};
+    }
+    
+    res.json(progressObj);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

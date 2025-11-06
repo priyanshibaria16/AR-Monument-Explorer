@@ -4,21 +4,35 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { achievements, getUserProgress, monuments } from '@/lib/monumentData';
+import { achievements, monuments } from '@/lib/monumentData';
+import { useAchievements, useMonuments, useUserProgress } from '@/hooks/useData';
 import { ArrowLeft, Trophy, Lock } from 'lucide-react';
 
 export default function Achievements() {
   const navigate = useNavigate();
-  const userProgress = getUserProgress();
+  const { achievements: achievementsList, loading: achievementsLoading } = useAchievements();
+  const { monuments: monumentsList, loading: monumentsLoading } = useMonuments();
+  const { progress: userProgress, loading: progressLoading } = useUserProgress();
+  
+  const achievementsToUse = achievementsList.length > 0 ? achievementsList : achievements;
+  const monumentsToUse = monumentsList.length > 0 ? monumentsList : monuments;
 
-  const unlockedAchievements = achievements.filter(a => 
-    userProgress.achievements.includes(a.id)
+  if (achievementsLoading || monumentsLoading || progressLoading || !userProgress) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  const unlockedAchievements = achievementsToUse.filter(a => 
+    (userProgress.achievements || []).includes(a.id)
   );
 
-  const progressPercentage = (unlockedAchievements.length / achievements.length) * 100;
+  const progressPercentage = (unlockedAchievements.length / achievementsToUse.length) * 100;
 
-  const getAchievementStatus = (achievement: typeof achievements[0]) => {
-    const isUnlocked = userProgress.achievements.includes(achievement.id);
+  const getAchievementStatus = (achievement: typeof achievementsToUse[0]) => {
+    const isUnlocked = (userProgress.achievements || []).includes(achievement.id);
     
     if (isUnlocked) return { unlocked: true, progress: 100 };
 
@@ -27,40 +41,40 @@ export default function Achievements() {
       case 'view_1_monument': {
         return {
           unlocked: false,
-          progress: Math.min((userProgress.visitedMonuments.length / 1) * 100, 100)
+          progress: Math.min(((userProgress.visitedMonuments || []).length / 1) * 100, 100)
         };
       }
       case 'ar_1_monument': {
         return {
           unlocked: false,
-          progress: Math.min((userProgress.arViewed.length / 1) * 100, 100)
+          progress: Math.min(((userProgress.arViewed || []).length / 1) * 100, 100)
         };
       }
       case 'view_all_monuments': {
         return {
           unlocked: false,
-          progress: (userProgress.visitedMonuments.length / monuments.length) * 100
+          progress: ((userProgress.visitedMonuments || []).length / monumentsToUse.length) * 100
         };
       }
       case 'narration_3_monuments': {
         return {
           unlocked: false,
-          progress: Math.min((userProgress.narrationPlayed.length / 3) * 100, 100)
+          progress: Math.min(((userProgress.narrationPlayed || []).length / 3) * 100, 100)
         };
       }
       case 'quiz_perfect_score': {
-        const hasAnyPerfect = Object.values(userProgress.quizScores).some((score) => score === 100);
+        const hasAnyPerfect = Object.values(userProgress.quizScores || {}).some((score) => score === 100);
         return {
           unlocked: false,
           progress: hasAnyPerfect ? 100 : 0
         };
       }
       case 'all_quizzes_perfect': {
-        const completedQuizzes = Object.keys(userProgress.quizScores).length;
-        const perfectQuizzes = Object.values(userProgress.quizScores).filter((score) => score === 100).length;
+        const completedQuizzes = Object.keys(userProgress.quizScores || {}).length;
+        const perfectQuizzes = Object.values(userProgress.quizScores || {}).filter((score) => score === 100).length;
         return {
           unlocked: false,
-          progress: completedQuizzes > 0 ? (perfectQuizzes / monuments.length) * 100 : 0
+          progress: completedQuizzes > 0 ? (perfectQuizzes / monumentsToUse.length) * 100 : 0
         };
       }
       default:
@@ -91,7 +105,7 @@ export default function Achievements() {
           <div className="flex justify-center mb-6">
             <div className="relative">
               <Trophy className="w-24 h-24 text-orange-600" />
-              {unlockedAchievements.length === achievements.length && (
+              {unlockedAchievements.length === achievementsToUse.length && (
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -115,7 +129,7 @@ export default function Achievements() {
             <CardHeader>
               <CardTitle className="text-2xl">Overall Progress</CardTitle>
               <CardDescription>
-                {unlockedAchievements.length} of {achievements.length} achievements unlocked
+                {unlockedAchievements.length} of {achievementsToUse.length} achievements unlocked
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -139,25 +153,25 @@ export default function Achievements() {
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Monuments Visited</CardDescription>
-              <CardTitle className="text-3xl">{userProgress.visitedMonuments.length}</CardTitle>
+              <CardTitle className="text-3xl">{(userProgress.visitedMonuments || []).length}</CardTitle>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>AR Experiences</CardDescription>
-              <CardTitle className="text-3xl">{userProgress.arViewed.length}</CardTitle>
+              <CardTitle className="text-3xl">{(userProgress.arViewed || []).length}</CardTitle>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Narrations Played</CardDescription>
-              <CardTitle className="text-3xl">{userProgress.narrationPlayed.length}</CardTitle>
+              <CardTitle className="text-3xl">{(userProgress.narrationPlayed || []).length}</CardTitle>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Quizzes Completed</CardDescription>
-              <CardTitle className="text-3xl">{Object.keys(userProgress.quizScores).length}</CardTitle>
+              <CardTitle className="text-3xl">{Object.keys(userProgress.quizScores || {}).length}</CardTitle>
             </CardHeader>
           </Card>
         </motion.div>
@@ -167,7 +181,7 @@ export default function Achievements() {
           <h2 className="text-3xl font-bold text-gray-800">All Achievements</h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {achievements.map((achievement, index) => {
+            {achievementsToUse.map((achievement, index) => {
               const status = getAchievementStatus(achievement);
               
               return (

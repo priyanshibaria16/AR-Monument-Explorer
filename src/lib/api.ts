@@ -44,9 +44,23 @@ export interface UserProgress {
   comparedMonuments: string[][];
 }
 
-// Get user ID (can be enhanced with authentication later)
+// Get auth token from localStorage
+const getAuthToken = () => {
+  return localStorage.getItem('authToken');
+};
+
+// Get user ID from token or use default
 const getUserId = () => {
-  return localStorage.getItem('userId') || 'default';
+  const token = getAuthToken();
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.userId || 'default';
+    } catch {
+      return 'default';
+    }
+  }
+  return 'default';
 };
 
 // API calls
@@ -93,16 +107,37 @@ export const api = {
   // Progress
   getUserProgress: async (userId?: string): Promise<UserProgress> => {
     const uid = userId || getUserId();
-    const response = await fetch(`${API_BASE_URL}/progress/${uid}`);
+    const token = getAuthToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(`${API_BASE_URL}/progress/${uid}`, { headers });
     if (!response.ok) throw new Error('Failed to fetch user progress');
-    return response.json();
+    const data = await response.json();
+    // Ensure all arrays exist
+    return {
+      visitedMonuments: data.visitedMonuments || [],
+      arViewed: data.arViewed || [],
+      narrationPlayed: data.narrationPlayed || [],
+      quizScores: data.quizScores || {},
+      achievements: data.achievements || [],
+      favorites: data.favorites || [],
+      tourProgress: data.tourProgress || 0,
+      comparedMonuments: data.comparedMonuments || []
+    };
   },
 
   updateUserProgress: async (progress: Partial<UserProgress>, userId?: string): Promise<UserProgress> => {
     const uid = userId || getUserId();
+    const token = getAuthToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const response = await fetch(`${API_BASE_URL}/progress/${uid}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(progress),
     });
     if (!response.ok) throw new Error('Failed to update user progress');
@@ -111,9 +146,14 @@ export const api = {
 
   addVisitedMonument: async (monumentId: string, userId?: string): Promise<UserProgress> => {
     const uid = userId || getUserId();
+    const token = getAuthToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const response = await fetch(`${API_BASE_URL}/progress/visited/${uid}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ monumentId }),
     });
     if (!response.ok) throw new Error('Failed to add visited monument');
@@ -122,9 +162,14 @@ export const api = {
 
   addARViewed: async (monumentId: string, userId?: string): Promise<UserProgress> => {
     const uid = userId || getUserId();
+    const token = getAuthToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const response = await fetch(`${API_BASE_URL}/progress/ar/${uid}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ monumentId }),
     });
     if (!response.ok) throw new Error('Failed to add AR viewed');
@@ -133,9 +178,14 @@ export const api = {
 
   addNarrationPlayed: async (monumentId: string, userId?: string): Promise<UserProgress> => {
     const uid = userId || getUserId();
+    const token = getAuthToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const response = await fetch(`${API_BASE_URL}/progress/narration/${uid}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ monumentId }),
     });
     if (!response.ok) throw new Error('Failed to add narration played');
@@ -144,9 +194,14 @@ export const api = {
 
   updateQuizScore: async (monumentId: string, score: number, userId?: string): Promise<UserProgress> => {
     const uid = userId || getUserId();
+    const token = getAuthToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const response = await fetch(`${API_BASE_URL}/progress/quiz/${uid}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ monumentId, score }),
     });
     if (!response.ok) throw new Error('Failed to update quiz score');
@@ -155,9 +210,14 @@ export const api = {
 
   toggleFavorite: async (monumentId: string, userId?: string): Promise<UserProgress> => {
     const uid = userId || getUserId();
+    const token = getAuthToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const response = await fetch(`${API_BASE_URL}/progress/favorite/${uid}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ monumentId }),
     });
     if (!response.ok) throw new Error('Failed to toggle favorite');
@@ -166,13 +226,60 @@ export const api = {
 
   addAchievement: async (achievementId: string, userId?: string): Promise<UserProgress> => {
     const uid = userId || getUserId();
+    const token = getAuthToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const response = await fetch(`${API_BASE_URL}/progress/achievement/${uid}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ achievementId }),
     });
     if (!response.ok) throw new Error('Failed to add achievement');
     return response.json();
+  },
+
+  // Auth
+  signup: async (email: string, password: string, name: string) => {
+    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, name }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to sign up');
+    }
+    return response.json();
+  },
+
+  login: async (email: string, password: string) => {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to log in');
+    }
+    return response.json();
+  },
+
+  getCurrentUser: async () => {
+    const token = getAuthToken();
+    if (!token) throw new Error('Not authenticated');
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to get user');
+    return response.json();
+  },
+
+  logout: () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
   },
 };
 

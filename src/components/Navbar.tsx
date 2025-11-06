@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/lib/themeContext';
+import { useAuth } from '@/lib/authContext';
 import { 
   Home, 
   Map, 
@@ -13,13 +14,17 @@ import {
   Moon, 
   Sun,
   Menu,
-  X
+  X,
+  LogIn,
+  LogOut,
+  User
 } from 'lucide-react';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -79,8 +84,37 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Theme Toggle & Mobile Menu */}
+          {/* Auth & Theme Toggle & Mobile Menu */}
           <div className="flex items-center space-x-2">
+            {user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate('/achievements')}
+                  className="hidden md:flex items-center gap-2"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="hidden lg:inline">{user.name}</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={logout}
+                  title="Logout"
+                >
+                  <LogOut className="w-5 h-5" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/login')}
+                className="hidden md:flex items-center gap-2"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Log In</span>
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -139,6 +173,31 @@ export default function Navbar() {
                 </Button>
               );
             })}
+            {user ? (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full justify-start"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  navigate('/login');
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full justify-start"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Log In
+              </Button>
+            )}
           </motion.div>
         )}
       </div>

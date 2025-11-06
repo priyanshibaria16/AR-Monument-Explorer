@@ -6,6 +6,7 @@ import monumentRoutes from './routes/monuments.js';
 import quizRoutes from './routes/quiz.js';
 import achievementRoutes from './routes/achievements.js';
 import progressRoutes from './routes/progress.js';
+import authRoutes from './routes/auth.js';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/explorer'
 });
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/monuments', monumentRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/achievements', achievementRoutes);
