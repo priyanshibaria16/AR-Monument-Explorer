@@ -106,6 +106,186 @@ const monumentsData = [
       'The structure is only 5 stories high but appears taller',
       'It was built without any foundation'
     ]
+  },
+  {
+    id: 'meenakshi-temple',
+    name: 'Meenakshi Amman Temple',
+    location: 'Madurai, Tamil Nadu',
+    coordinates: [9.9193, 78.1198],
+    description: 'A historic Hindu temple dedicated to Goddess Meenakshi and Lord Sundareswarar',
+    history: 'The Meenakshi Temple is one of the most famous temples in South India. It was built in the 16th century by the Nayak dynasty. The temple complex covers 14 acres and has 14 gopurams (towers), with the tallest being 170 feet high.',
+    modelUrl: 'https://models.readyplayer.me/64f1a5b5c9c5e3001f5e5e63.glb',
+    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96',
+    yearBuilt: '16th Century',
+    architect: 'Nayak Dynasty',
+    category: 'temple',
+    era: 'medieval',
+    region: 'south',
+    funFacts: [
+      'The temple has 14 gopurams (gateway towers)',
+      'It attracts over 15,000 visitors daily',
+      'The temple has 33,000 sculptures throughout its complex'
+    ]
+  },
+  {
+    id: 'charminar',
+    name: 'Charminar',
+    location: 'Hyderabad, Telangana',
+    coordinates: [17.3616, 78.4747],
+    description: 'A mosque and monument built in 1591, iconic symbol of Hyderabad',
+    history: 'Charminar was constructed in 1591 by Muhammad Quli Qutb Shah, the fifth ruler of the Qutb Shahi dynasty. It was built to commemorate the end of a deadly plague. The monument has four minarets and is built in Indo-Islamic architectural style.',
+    modelUrl: 'https://models.readyplayer.me/64f1a5b5c9c5e3001f5e5e64.glb',
+    image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5',
+    yearBuilt: '1591',
+    architect: 'Muhammad Quli Qutb Shah',
+    category: 'monument',
+    era: 'medieval',
+    region: 'south',
+    funFacts: [
+      'Charminar means "Four Minarets" in Urdu',
+      'It has a mosque on its top floor',
+      'The monument is a UNESCO World Heritage Site candidate'
+    ]
+  },
+  {
+    id: 'golden-temple',
+    name: 'Golden Temple (Harmandir Sahib)',
+    location: 'Amritsar, Punjab',
+    coordinates: [31.6199, 74.8765],
+    description: 'The holiest Gurdwara of Sikhism, covered in gold leaf',
+    history: 'The Golden Temple was built in 1589 by Guru Arjan Dev, the fifth Sikh Guru. The temple was rebuilt in 1764 after being destroyed, and Maharaja Ranjit Singh covered the upper floors with gold leaf in 1830. It represents the Sikh belief in equality and openness.',
+    modelUrl: 'https://models.readyplayer.me/64f1a5b5c9c5e3001f5e5e65.glb',
+    image: 'https://images.unsplash.com/photo-1555993536-1e0d0c4b4c5c',
+    yearBuilt: '1589',
+    architect: 'Guru Arjan Dev',
+    category: 'temple',
+    era: 'medieval',
+    region: 'north',
+    funFacts: [
+      'The temple is open to people of all faiths',
+      'It serves free meals to over 100,000 people daily',
+      'The gold covering was added in 1830 by Maharaja Ranjit Singh'
+    ]
+  },
+  {
+    id: 'victoria-memorial',
+    name: 'Victoria Memorial',
+    location: 'Kolkata, West Bengal',
+    coordinates: [22.5448, 88.3426],
+    description: 'A large marble building dedicated to Queen Victoria',
+    history: 'The Victoria Memorial was built between 1906 and 1921 to commemorate Queen Victoria. It was designed by Sir William Emerson in Indo-Saracenic revivalist style. The memorial is now a museum and tourist attraction.',
+    modelUrl: 'https://models.readyplayer.me/64f1a5b5c9c5e3001f5e5e66.glb',
+    image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5',
+    yearBuilt: '1906-1921',
+    architect: 'Sir William Emerson',
+    category: 'monument',
+    era: 'modern',
+    region: 'east',
+    funFacts: [
+      'The memorial is made of white Makrana marble',
+      'It houses a museum with over 28,000 artifacts',
+      'The memorial covers 64 acres of gardens'
+    ]
+  },
+  {
+    id: 'mysore-palace',
+    name: 'Mysore Palace',
+    location: 'Mysore, Karnataka',
+    coordinates: [12.3052, 76.6552],
+    description: 'The official residence of the Wadiyar dynasty and the seat of the Kingdom of Mysore',
+    history: 'The current Mysore Palace was built between 1897 and 1912 after the previous palace was destroyed by fire. It was designed by British architect Henry Irwin in Indo-Saracenic style. The palace is illuminated with 97,000 light bulbs on Sundays and during festivals.',
+    modelUrl: 'https://models.readyplayer.me/64f1a5b5c9c5e3001f5e5e67.glb',
+    image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41',
+    yearBuilt: '1897-1912',
+    architect: 'Henry Irwin',
+    category: 'palace',
+    era: 'modern',
+    region: 'south',
+    funFacts: [
+      'The palace is illuminated with 97,000 light bulbs on special occasions',
+      'It has over 100 rooms and halls',
+      'The palace receives over 6 million visitors annually'
+    ]
+  },
+  {
+    id: 'sun-temple',
+    name: 'Konark Sun Temple',
+    location: 'Konark, Odisha',
+    coordinates: [19.8876, 86.0945],
+    description: 'A 13th-century Sun Temple dedicated to the Sun God Surya',
+    history: 'The Konark Sun Temple was built in 1250 CE by King Narasimhadeva I of the Eastern Ganga Dynasty. The temple is designed in the shape of a gigantic chariot with 24 wheels pulled by 7 horses. It is a UNESCO World Heritage Site.',
+    modelUrl: 'https://models.readyplayer.me/64f1a5b5c9c5e3001f5e5e68.glb',
+    image: 'https://images.unsplash.com/photo-1587135941948-670b381f08ce',
+    yearBuilt: '1250 CE',
+    architect: 'King Narasimhadeva I',
+    category: 'temple',
+    era: 'medieval',
+    region: 'east',
+    funFacts: [
+      'The temple is designed as a chariot with 24 wheels',
+      'It is a UNESCO World Heritage Site',
+      'The temple was partially buried in sand for centuries'
+    ]
+  },
+  {
+    id: 'ellora-caves',
+    name: 'Ellora Caves',
+    location: 'Aurangabad, Maharashtra',
+    coordinates: [20.0263, 75.1790],
+    description: 'A series of 34 rock-cut cave temples and monasteries',
+    history: 'The Ellora Caves were carved between 600 and 1000 CE. They represent Hindu, Buddhist, and Jain religious traditions. The Kailasa Temple, carved from a single rock, is one of the largest monolithic structures in the world.',
+    modelUrl: 'https://models.readyplayer.me/64f1a5b5c9c5e3001f5e5e69.glb',
+    image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5',
+    yearBuilt: '600-1000 CE',
+    architect: 'Various Dynasties',
+    category: 'temple',
+    era: 'ancient',
+    region: 'west',
+    funFacts: [
+      'The caves contain 34 monasteries and temples',
+      'Kailasa Temple is carved from a single rock',
+      'It is a UNESCO World Heritage Site'
+    ]
+  },
+  {
+    id: 'amer-fort',
+    name: 'Amer Fort',
+    location: 'Jaipur, Rajasthan',
+    coordinates: [26.9855, 75.8513],
+    description: 'A magnificent fort palace known for its artistic Hindu style elements',
+    history: 'Amer Fort was built in 1592 by Raja Man Singh I. The fort is known for its blend of Hindu and Mughal architecture. It features massive gates, palaces, and temples. The fort is built with red sandstone and marble.',
+    modelUrl: 'https://models.readyplayer.me/64f1a5b5c9c5e3001f5e5e70.glb',
+    image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41',
+    yearBuilt: '1592',
+    architect: 'Raja Man Singh I',
+    category: 'fort',
+    era: 'medieval',
+    region: 'north',
+    funFacts: [
+      'The fort has an underground tunnel connecting to Jaigarh Fort',
+      'It features the Sheesh Mahal (Palace of Mirrors)',
+      'The fort is situated on a hilltop overlooking Maota Lake'
+    ]
+  },
+  {
+    id: 'lotus-temple',
+    name: 'Lotus Temple',
+    location: 'New Delhi',
+    coordinates: [28.5535, 77.2588],
+    description: 'A Bahá\'í House of Worship shaped like a lotus flower',
+    history: 'The Lotus Temple was completed in 1986 and designed by Iranian architect Fariborz Sahba. It is made of white marble and shaped like a lotus flower with 27 petals. The temple is open to people of all faiths.',
+    modelUrl: 'https://models.readyplayer.me/64f1a5b5c9c5e3001f5e5e71.glb',
+    image: 'https://images.unsplash.com/photo-1587135941948-670b381f08ce',
+    yearBuilt: '1986',
+    architect: 'Fariborz Sahba',
+    category: 'temple',
+    era: 'modern',
+    region: 'north',
+    funFacts: [
+      'The temple is shaped like a lotus with 27 petals',
+      'It is made entirely of white marble',
+      'The temple is open to people of all faiths'
+    ]
   }
 ];
 
@@ -179,6 +359,55 @@ const quizQuestionsData = [
     question: 'How many windows does Hawa Mahal have?',
     options: ['753', '853', '953', '1053'],
     correctAnswer: 2
+  },
+  {
+    id: 'q11',
+    monumentId: 'meenakshi-temple',
+    question: 'How many gopurams (towers) does Meenakshi Temple have?',
+    options: ['10', '12', '14', '16'],
+    correctAnswer: 2
+  },
+  {
+    id: 'q12',
+    monumentId: 'charminar',
+    question: 'What does "Charminar" mean in Urdu?',
+    options: ['Four Towers', 'Four Minarets', 'Four Gates', 'Four Pillars'],
+    correctAnswer: 1
+  },
+  {
+    id: 'q13',
+    monumentId: 'golden-temple',
+    question: 'How many people does the Golden Temple serve free meals to daily?',
+    options: ['50,000', '75,000', '100,000', '125,000'],
+    correctAnswer: 2
+  },
+  {
+    id: 'q14',
+    monumentId: 'mysore-palace',
+    question: 'How many light bulbs illuminate Mysore Palace on special occasions?',
+    options: ['87,000', '92,000', '97,000', '102,000'],
+    correctAnswer: 2
+  },
+  {
+    id: 'q15',
+    monumentId: 'sun-temple',
+    question: 'How many wheels does the Konark Sun Temple chariot have?',
+    options: ['12', '18', '24', '30'],
+    correctAnswer: 2
+  },
+  {
+    id: 'q16',
+    monumentId: 'ellora-caves',
+    question: 'How many caves are in the Ellora Caves complex?',
+    options: ['30', '32', '34', '36'],
+    correctAnswer: 2
+  },
+  {
+    id: 'q17',
+    monumentId: 'lotus-temple',
+    question: 'How many petals does the Lotus Temple have?',
+    options: ['24', '27', '30', '33'],
+    correctAnswer: 1
   }
 ];
 
@@ -207,7 +436,7 @@ const achievementsData = [
   {
     id: 'monument-collector',
     name: 'Monument Collector',
-    description: 'Visit all 5 monuments',
+    description: 'Visit all 15 monuments',
     icon: '🗺️',
     requirement: 'view_all_monuments'
   },
